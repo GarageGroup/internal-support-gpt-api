@@ -52,6 +52,14 @@ jobs:
     - name: Pack Api.csproj
       run: dotnet pack ./src/*/Api.csproj --no-build -o ~/nuget  -c Release
 
+    # Test.csproj
+
+    - name: Restore Test
+      run: dotnet restore ./src/*/*/Test.csproj
+
+    - name: Test Test
+      run: dotnet test ./src/*/*/Test.csproj --no-build -o ~/nuget  -c Release
+
     # Push
 
     - name: Push Packages

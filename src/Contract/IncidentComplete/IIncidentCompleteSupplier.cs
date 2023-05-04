@@ -6,5 +6,6 @@ namespace GGroupp.Internal.Support;
 
 public interface IIncidentCompleteSupplier
 {
-    ValueTask<Result<IncidentCompleteOut, Failure<Unit>>> CompleteIncidentAsync(IncidentCompleteIn input, CancellationToken cancellationToken);
+    ValueTask<Result<IncidentCompleteOut, Failure<IncidentCompleteFailureCode>>> CompleteIncidentAsync(
+        IncidentCompleteIn input, CancellationToken cancellationToken);
 }

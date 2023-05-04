@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 
 namespace GGroupp.Internal.Support;
@@ -27,5 +28,21 @@ internal sealed partial class SupportGptApi : ISupportGptApi
 
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {option.ApiKey}");
         return httpClient;
+    }
+
+    private static string? TrimTitle(string? source)
+    {
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return null;
+        }
+
+        var title = source.Trim('.').Trim();
+        if (title.StartsWith('"') && title.EndsWith('"'))
+        {
+            title = title[1..^1];
+        }
+
+        return title.Trim('.').Trim().OrNullIfEmpty();
     }
 }

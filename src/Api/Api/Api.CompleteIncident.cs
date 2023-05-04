@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -10,27 +11,28 @@ namespace GGroupp.Internal.Support;
 
 partial class SupportGptApi
 {
-    public ValueTask<Result<IncidentCompleteOut, Failure<Unit>>> CompleteIncidentAsync(
+    public ValueTask<Result<IncidentCompleteOut, Failure<IncidentCompleteFailureCode>>> CompleteIncidentAsync(
         IncidentCompleteIn input, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(input);
 
         if (cancellationToken.IsCancellationRequested)
         {
-            return ValueTask.FromCanceled<Result<IncidentCompleteOut, Failure<Unit>>>(cancellationToken);
+            return ValueTask.FromCanceled<Result<IncidentCompleteOut, Failure<IncidentCompleteFailureCode>>>(cancellationToken);
         }
 
         return InnerCompleteIncidentAsync(input, cancellationToken);
     }
 
-    private async ValueTask<Result<IncidentCompleteOut, Failure<Unit>>> InnerCompleteIncidentAsync(
+    private async ValueTask<Result<IncidentCompleteOut, Failure<IncidentCompleteFailureCode>>> InnerCompleteIncidentAsync(
         IncidentCompleteIn input, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(input.Message))
+        if (string.IsNullOrWhiteSpace(input.Message))
         {
             return default(IncidentCompleteOut);
         }
 
+        var sourceMessage = input.Message.Trim();
         var jsonIn = new ChatGptJsonIn
         {
             Model = option.IncidentComplete.Model,
@@ -48,9 +50,17 @@ partial class SupportGptApi
         using var httpResponse = await httpClient.PostAsync(OpenAiCompletionsUrl, content, cancellationToken).ConfigureAwait(false);
         var httpResponseText = await httpResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
+        if (httpResponse.StatusCode is HttpStatusCode.TooManyRequests)
+        {
+            var errorMessage = ReadErrorMessage(httpResponseText);
+            return Failure.Create(IncidentCompleteFailureCode.TooManyRequests, errorMessage);
+        }
+
         if (httpResponse.IsSuccessStatusCode is false)
         {
-            return Failure.Create($"An unexpected http status code: {httpResponse.StatusCode}. Body: {httpResponseText}");
+            return Failure.Create(
+                IncidentCompleteFailureCode.Unknown,
+                $"An unexpected http status code: {httpResponse.StatusCode}. Body: {httpResponseText}");
         }
 
         var jsonOut = JsonSerializer.Deserialize<ChatGptJsonOut>(httpResponseText);
@@ -58,17 +68,21 @@ partial class SupportGptApi
 
         if (choice is null)
         {
-            return Failure.Create($"GPT result choices are absent. Source message: {input.Message}");
+            return Failure.Create(
+                IncidentCompleteFailureCode.Unknown,
+                $"GPT result choices are absent. Body: {httpResponseText}");
         }
 
         if (string.Equals(choice.FinishReason, "stop", StringComparison.InvariantCultureIgnoreCase) is false)
         {
-            return Failure.Create($"An unexpected GPT finish reason: {choice.FinishReason}. Source message: {input.Message}");
+            return Failure.Create(
+                IncidentCompleteFailureCode.Unknown,
+                $"An unexpected GPT finish reason: {choice.FinishReason}. Body: {httpResponseText}");
         }
 
         return new IncidentCompleteOut
         {
-            Title = choice.Message?.Content?.Trim()?.TrimEnd('.')
+            Title = TrimTitle(choice.Message?.Content)
         };
 
         ChatMessageJson CreateChatMessageJson(ChatMessageOption messageOption)
@@ -76,7 +90,23 @@ partial class SupportGptApi
             new()
             {
                 Role = messageOption.Role,
-                Content = string.Format(messageOption.ContentTemplate, input.Message)
+                Content = string.Format(messageOption.ContentTemplate, sourceMessage)
             };
+    }
+
+    private static string? ReadErrorMessage(string? httpResponseText)
+    {
+        if (string.IsNullOrEmpty(httpResponseText))
+        {
+            return null;
+        }
+
+        var message = JsonSerializer.Deserialize<ChatFailureJson>(httpResponseText)?.Error?.Message;
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return httpResponseText;
+        }
+
+        return message;
     }
 }
