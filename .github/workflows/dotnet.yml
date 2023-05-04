@@ -55,10 +55,10 @@ jobs:
     # Test.csproj
 
     - name: Restore Test
-      run: dotnet restore ./src/*/*/Test.csproj
+      run: dotnet restore ./src/*/Test.csproj
 
     - name: Test Test
-      run: dotnet test ./src/*/*/Test.csproj --no-build -o ~/nuget  -c Release
+      run: dotnet test ./src/*/Test.csproj --no-build -o ~/nuget  -c Release
 
     # Push
 
