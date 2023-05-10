@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using PrimeFuncPack;
 
-namespace GGroupp.Internal.Support;
+namespace GarageGroup.Internal.Support;
 
 public static class SupportGptApiDependency
 {

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GGroupp.Internal.Support.GptApi.Test;
+namespace GarageGroup.Internal.Support.GptApi.Test;
 
 internal sealed record class StubErrorInfoJson
 {

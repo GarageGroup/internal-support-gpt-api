@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace GGroupp.Internal.Support.GptApi.Test;
+namespace GarageGroup.Internal.Support.GptApi.Test;
 
 partial class SupportGptApiTestSource
 {

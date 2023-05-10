@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GGroupp.Internal.Support.GptApi.Test;
+namespace GarageGroup.Internal.Support.GptApi.Test;
 
 internal sealed class StubHttpMessageHandler : HttpMessageHandler
 {

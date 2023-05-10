@@ -1,7 +1,7 @@
 using System;
 using System.Net.Http;
 
-namespace GGroupp.Internal.Support;
+namespace GarageGroup.Internal.Support;
 
 internal sealed partial class SupportGptApi : ISupportGptApi
 {

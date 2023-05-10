@@ -6,7 +6,7 @@ using System.Threading;
 using Moq;
 using PrimeFuncPack;
 
-namespace GGroupp.Internal.Support.GptApi.Test;
+namespace GarageGroup.Internal.Support.GptApi.Test;
 
 public static partial class SupportGptApiTest
 {
