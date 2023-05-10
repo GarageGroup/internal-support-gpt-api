@@ -6,8 +6,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using GGroupp;
 
-namespace GGroupp.Internal.Support;
+namespace GarageGroup.Internal.Support;
 
 partial class SupportGptApi
 {

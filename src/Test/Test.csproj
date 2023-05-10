@@ -6,8 +6,8 @@
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>GGroupp.Internal.Support.GptApi.Test</RootNamespace>
-    <AssemblyName>GGroupp.Internal.Support.GptApi.Test</AssemblyName>
+    <RootNamespace>GarageGroup.Internal.Support.GptApi.Test</RootNamespace>
+    <AssemblyName>GarageGroup.Internal.Support.GptApi.Test</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

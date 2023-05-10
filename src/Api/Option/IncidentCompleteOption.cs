@@ -1,6 +1,6 @@
 using System;
 
-namespace GGroupp.Internal.Support;
+namespace GarageGroup.Internal.Support;
 
 public sealed record class IncidentCompleteOption
 {

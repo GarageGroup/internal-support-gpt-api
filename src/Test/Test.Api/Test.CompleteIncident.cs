@@ -7,7 +7,7 @@ using Moq;
 using PrimeFuncPack.UnitTest;
 using Xunit;
 
-namespace GGroupp.Internal.Support.GptApi.Test;
+namespace GarageGroup.Internal.Support.GptApi.Test;
 
 partial class SupportGptApiTest
 {
