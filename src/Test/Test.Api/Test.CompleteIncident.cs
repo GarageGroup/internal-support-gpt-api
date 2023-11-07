@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
 using PrimeFuncPack.UnitTest;
 using Xunit;
 
@@ -15,9 +14,8 @@ partial class SupportGptApiTest
     public static async Task CompleteIncidentAsync_InputIsNull_ExpectArgumentNullException()
     {
         using var response = CreateSuccessResponse(SomeResponseMessage);
-        var mockProxyHandler = CreateMockProxyHandler(response);
+        using var messageHandler = new MockHttpMessageHandler(response);
 
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
         var api = CreateSupportGptApi(messageHandler, SomeOption);
 
         var cancellationToken = new CancellationToken(canceled: false);
@@ -34,9 +32,8 @@ partial class SupportGptApiTest
     public static void CompleteIncidentAsync_CancellationTokenIsCanceled_ExpectCanceledTask()
     {
         using var response = CreateSuccessResponse(SomeResponseMessage);
-        var mockProxyHandler = CreateMockProxyHandler(response);
+        using var messageHandler = new MockHttpMessageHandler(response);
 
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
         var api = CreateSupportGptApi(messageHandler, SomeOption);
 
         var cancellationToken = new CancellationToken(canceled: true);
@@ -53,9 +50,8 @@ partial class SupportGptApiTest
         string inputMessage)
     {
         using var response = CreateSuccessResponse(SomeResponseMessage);
-        var mockProxyHandler = CreateMockProxyHandler(response);
+        using var messageHandler = new MockHttpMessageHandler(response);
 
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
         var api = CreateSupportGptApi(messageHandler, SomeOption);
 
         var input = new IncidentCompleteIn(inputMessage);
@@ -73,24 +69,25 @@ partial class SupportGptApiTest
         SupportGptApiOption option, IncidentCompleteIn input, string expectedContent, string expectedAuthorization)
     {
         using var response = CreateSuccessResponse(SomeResponseMessage);
-        var mockProxyHandler = CreateMockProxyHandler(response, OnRequestSent);
+        using var messageHandler = new MockHttpMessageHandler(response, OnRequestSentAsync);
 
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
         var api = CreateSupportGptApi(messageHandler, option);
 
         var cancellationToken = new CancellationToken(canceled: false);
         _ = await api.CompleteIncidentAsync(input, cancellationToken);
 
-        mockProxyHandler.Verify(h => h.InvokeAsync(It.IsAny<HttpRequestMessage>(), It.IsAny<CancellationToken>()), Times.Once);
+        messageHandler.Verify(1);
 
-        void OnRequestSent(HttpRequestMessage actual)
+        async Task OnRequestSentAsync(HttpRequestMessage actual)
         {
             Assert.Equal(HttpMethod.Post, actual.Method);
 
             var actualRequestUrl = actual.RequestUri?.ToString();
             Assert.Equal("https://api.openai.com/v1/chat/completions", actualRequestUrl, ignoreCase: true);
 
-            var actualContent = actual.Content?.ReadAsStringAsync().Result;
+            Assert.NotNull(actual.Content);
+
+            var actualContent = await actual.Content.ReadAsStringAsync();
             Assert.Equal(expectedContent, actualContent);
 
             var actualAuthorization = actual.Headers.Authorization?.ToString();
@@ -108,9 +105,7 @@ partial class SupportGptApiTest
             Content = responseContent is null ? null : new StringContent(responseContent)
         };
 
-        var mockProxyHandler = CreateMockProxyHandler(response);
-
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
+        using var messageHandler = new MockHttpMessageHandler(response);
         var api = CreateSupportGptApi(messageHandler, SomeOption);
 
         var cancellationToken = new CancellationToken(canceled: false);
@@ -129,9 +124,7 @@ partial class SupportGptApiTest
             Content = new StringContent(responseContent)
         };
 
-        var mockProxyHandler = CreateMockProxyHandler(response);
-
-        using var messageHandler = new StubHttpMessageHandler(mockProxyHandler.Object);
+        using var messageHandler = new MockHttpMessageHandler(response);
         var api = CreateSupportGptApi(messageHandler, SomeOption);
 
         var cancellationToken = new CancellationToken(canceled: false);
