@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>GarageGroup.Internal.Support</RootNamespace>
     <AssemblyName>GarageGroup.Internal.Support.GptApi.Api</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GarageGroup.Core.Collections.FlatArray.Extensions" Version="1.8.0" />
-    <PackageReference Include="GarageGroup.Internal.Support.GptApi.Contract" Version="1.0.0" />
+    <PackageReference Include="GarageGroup.Core.Collections.FlatArray.Extensions" Version="1.9.1" />
+    <PackageReference Include="GarageGroup.Internal.Support.GptApi.Contract" Version="1.0.1" />
     <PackageReference Include="PrimeFuncPack.Dependency.Core" Version="2.0.2" />
     <PackageReference Include="PrimeFuncPack.Primitives.Strings" Version="2.0.2" />
   </ItemGroup>
